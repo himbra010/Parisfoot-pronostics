@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Pronostics Foot Premium</title>
+    <style>
+        :root {
+            --noir: #0a0a0a;
+            --bleu: #0066ff;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--noir);
+            color: white;
+        }
+
+        header {
+            background-color: var(--bleu);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .match-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .match {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--bleu);
+        }
+
+        .admin-panel {
+            background: #222;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        button {
+            background: var(--bleu);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        .payment-box {
+            text-align: center;
+            padding: 30px;
+            background: #111;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚀 Pronostics Foot Premium</h1>
+        <div id="contact-support">Contact: support@pronos.com</div>
+    </header>
+
+    <div class="container">
+        <div class="payment-box">
+            <h3>Accès 24h - 200FCFA</h3>
+            <p>Envoyez 200FCFA au 05-85-33-67 pour activer votre accès</p>
+            <button onclick="activateAccess()">J'ai payé</button>
+            <div id="timer"></div>
+        </div>
+
+        <div id="matches-content" style="display:none;">
+            <div class="match-container" id="matchesList"></div>
+        </div>
+
+        <div class="admin-panel" id="adminPanel">
+            <h3>Panel Admin</h3>
+            <button onclick="toggleEditMode('matches')">Modifier Matchs</button>
+            <button onclick="toggleEditMode('contact')">Modifier Contact</button>
+            <div id="editArea"></div>
+        </div>
+    </div>
+
+<script>
+let matches = [];
+let contactInfo = "support@pronos.com";
+let adminPassword = "admin123";
+let accessActive = false;
+
+function activateAccess() {
+    // Simulation d'activation d'accès
+    accessActive = true;
+    document.getElementById('matches-content').style.display = 'block';
+    startTimer(24 * 60 * 60);
+}
+
+function startTimer(duration) {
+    let timer = duration, hours, minutes, seconds;
+    setInterval(() => {
+        hours = parseInt(timer / 3600, 10);
+        minutes = parseInt((timer % 3600) / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        document.getElementById('timer').innerHTML = 
+            `Temps restant: ${hours}h ${minutes}m ${seconds}s`;
+
+        if (--timer < 0) {
+            accessActive = false;
+            document.getElementById('matches-content').style.display = 'none';
+        }
+    }, 1000);
+}
+
+// Fonctions admin
+function toggleEditMode(type) {
+    if(type === 'matches') {
+        document.getElementById('editArea').innerHTML = `
+            <h4>Ajouter un Match</h4>
+            <input type="date" id="matchDate">
+            <input type="text" id="league" placeholder="Ligue">
+            <input type="text" id="team1" placeholder="Équipe 1">
+            <input type="text" id="team2" placeholder="Équipe 2">
+            <button onclick="addMatch()">Ajouter</button>
+            <div id="matchesEditList"></div>
+        `;
+        refreshMatchesEdit();
+    }
+}
+
+function addMatch() {
+    const newMatch = {
+        date: document.getElementById('matchDate').value,
+        league: document.getElementById('league').value,
+        team1: document.getElementById('team1').value,
+        team2: document.getElementById('team2').value,
+        prediction: '',
+        goals: ''
+    };
+    matches.push(newMatch);
+    refreshMatchesEdit();
+}
+
+function refreshMatchesEdit() {
+    let html = '';
+    matches.forEach((match, index) => {
+        html += `
+            <div class="match">
+                <input value="${match.date}">
+                <input value="${match.league}">
+                <input value="${match.team1} vs ${match.team2}">
+                <input placeholder="Pronostic" value="${match.prediction}">
+                <input placeholder="Total buts" value="${match.goals}">
+                <button onclick="deleteMatch(${index})">X</button>
+            </div>
+        `;
+    });
+    document.getElementById('matchesEditList').innerHTML = html;
+}
+
+// Protection admin
+if(prompt('Mot de passe admin:') === adminPassword) {
+    document.getElementById('adminPanel').style.display = 'block';
+    accessActive = true;
+    document.getElementById('matches-content').style.display = 'block';
+}
+
+// Chargement initial
+matches = Array(10).fill().map(() => ({
+    date: "2023-12-01",
+    league: "Ligue 1",
+    team1: "Team A",
+    team2: "Team B",
+    prediction: "Victoire Team A",
+    goals: "2-1"
+}));
+</script>
+</body>
+</html>
